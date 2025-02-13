@@ -1,0 +1,219 @@
+/* General Body Styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #fff;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Header Styling */
+.header {
+    background-color: darkorange;
+    color: black;
+    padding: 20px 0;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.header h1 {
+    font-size: 28px;
+    margin: 0;
+}
+
+/* Main container to hold sidebar and content */
+.container {
+    display: flex;
+    flex-grow: 1;
+}
+
+/* Sidebar Styling */
+.sidebar {
+    width: 250px;
+    background-color: #333;
+    color: #fff;
+    padding-top: 20px;
+    position: fixed;
+    height: 100%;
+    top: 0;
+    left: 0;
+}
+
+.sidebar ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.sidebar ul li {
+    padding: 15px;
+    text-align: left;
+}
+
+.sidebar ul li a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 18px;
+}
+
+.sidebar ul li a:hover {
+    background-color: darkorange;
+}
+
+/* Main content styling */
+.main-content {
+    margin-left: 250px;
+    padding: 20px;
+    flex-grow: 1;
+}
+
+/* Login Container Styling */
+.login-container {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    width: 100%;
+    height: 100%;
+    max-width: 400px;
+    text-align: center;
+    margin: 30px auto;
+    /* Center the form */
+    flex-grow: 1;
+    /* Allow container to expand and take up space */
+}
+
+/* Logout Link Styling */
+.logout {
+    display: flex;
+    /* Aligns child elements side by side */
+    align-items: center;
+    /* Vertically aligns items to the center */
+    position: absolute;
+    top: 100px;
+    right: 20px;
+    font-size: 16px;
+    text-decoration: none;
+    flex-direction: row;
+}
+
+/* Header Styling */
+h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+/* Label Styling */
+label {
+    font-size: 16px;
+    margin-bottom: 8px;
+    display: block;
+    text-align: left;
+}
+
+.side_by_side {
+    display: flex;
+    /* Aligns child elements side by side */
+    flex-direction: row;
+}
+
+/* Input Fields Styling */
+input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+button {
+    width: 100%;
+    height: 40px;
+    margin-left: 8px;
+    border-width: 0px;
+}
+
+/* Submit Button Styling */
+button[type="submit"] {
+    background-color: darkblue;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    width: 100%;
+}
+
+/* Button Hover Effect */
+button[type="submit"]:hover {
+    background-color: darkblue;
+}
+
+/* Link Styling */
+a {
+    color: #007BFF;
+    text-decoration: none;
+    font-size: 14px;
+    margin-left: 8px;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Footer Styling */
+.footer {
+    background-color: darkgoldenrod;
+    color: black;
+    text-align: center;
+    padding: 10px 0;
+    position: relative;
+    width: 100%;
+    bottom: 0;
+}
+
+/* Ensure labels and inputs are vertically stacked */
+.booking-fields .field {
+    margin-bottom: 15px;
+}
+
+.booking-fields label {
+    display: block;
+    margin-bottom: 5px;
+    /* Space between label and input */
+}
+
+.booking-fields {
+    margin-top: 50px;
+    display: flex;
+    /* Aligns child elements side by side */
+    flex-direction: row;
+    justify-content: center;
+    margin-bottom: 10px;
+    background-color: orange;
+}
+
+.booking-fields input,
+.booking-fields select {
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+    /* Ensure inputs take up full width */
+}
+
+tr {
+    padding-right: 8px;
+}
+
+th {
+    padding-right: 20px;
+}
+
+table {
+    background-color: orange;
+    justify-content: center;
+}

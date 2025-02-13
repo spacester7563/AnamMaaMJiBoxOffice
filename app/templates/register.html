@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+    <header class="header">
+        <div class="header-container">
+            <h1>Welcome to BoxOffice</h1>
+        </div>
+    </header>
+
+    <div class="login-container">
+        <h2>Please Register Here!</h2>
+
+
+        <form method="POST">
+            {{ form.hidden_tag() }}
+
+            <label for="user_name">{{ form.user_name.label }}</label>
+            {{ form.user_name() }}<br>
+
+            <label for="email">{{ form.email.label }}</label>
+            {{ form.email() }}<br>
+
+            <label for="mobile_number">{{ form.mobile_number.label }}</label>
+            {{ form.mobile_number() }}<br>
+
+            <label for="date_of_birth">{{ form.date_of_birth.label }}</label>
+            {{ form.date_of_birth() }}<br>
+
+            <label for="password">{{ form.password.label }}</label>
+            {{ form.password() }}<br>
+
+            <label for="confirm_password">{{ form.confirm_password.label }}</label>
+            {{ form.confirm_password() }}<br>
+
+            <label for="security_question">{{ form.security_question.label }}</label>
+            {{ form.security_question() }}<br>
+
+            <label for="security_answer">{{ form.security_answer.label }}</label>
+            {{ form.security_answer() }}<br>
+
+            <div class="side_by_side">
+                {{ form.submit() }}
+                <button type="button" onclick="window.location.href='{{ url_for('main.index') }}'">Login</button>
+            </div>
+        </form>
+
+        <br>
+    </div>
+
+    <footer class="footer">
+        <p>Copyright www.boxoffice.com</p>
+    </footer>
+</body>
+</html>

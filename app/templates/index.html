@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+
+    <header class="header">
+        <div class="header-container">
+            <h1>Welcome to BoxOffice</h1>
+        </div>
+    </header>
+
+    <div class="login-container">
+        <h2>Enter your credentials</h2>
+    
+        <form method="POST">
+            {{ form.hidden_tag() }}
+            
+            <label for="email">{{ form.email.label }}</label>
+            {{ form.email() }}<br>
+
+            <label for="password">{{ form.password.label }}</label>
+            {{ form.password() }}<br>
+            <div class="side_by_side">
+                {{ form.submit() }}
+                <button type="reset">RESET</button>
+            </div>
+        </form>
+        <br>
+        <a href="{{ url_for('main.change_password') }}">Change Password</a>
+        <a href="{{ url_for('main.register') }}">Register</a>
+    </div>
+
+    <footer class="footer">
+        <p>Copyright www.boxoffice.com</p>
+    </footer>
+
+</body>
+</html>

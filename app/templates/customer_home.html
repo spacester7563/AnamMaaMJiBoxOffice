@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Home</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header class="header">
+        <div class="header-container">
+            <h1>Welcome to BoxOffice</h1>
+        </div>
+    </header>
+    
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <ul>
+                <li><a href="{{ url_for('main.book_ticket') }}">View Book Movie</a></li>
+                <li><a href="{{ url_for('main.cancel_ticket') }}">Cancel Movie</a></li>
+                <li><a href="{{ url_for('main.booking_history') }}">History</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="logout">
+                <p>{{ user_name }} </p>
+                <a href="/index">Logout</a>
+            </div>
+            <div class="login-container">
+                <h2>BoxOffice Welcomes You</h2>
+                <p>Hello Customer!</p>
+            </div>
+        </main>
+    </div>
+
+    <footer class="footer">
+        <p>Copyright www.boxoffice.com</p>
+    </footer>
+</body>
+</html>

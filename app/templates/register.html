@@ -18,6 +18,13 @@
     <div class="login-container">
         <h2>Please Register Here!</h2>
 
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
 
         <form method="POST">
             {{ form.hidden_tag() }}
@@ -47,7 +54,7 @@
             {{ form.security_answer() }}<br>
 
             <div class="side_by_side">
-                {{ form.submit() }}
+                {{ form.submitRegisteration() }}
                 <button type="button" onclick="window.location.href='{{ url_for('main.index') }}'">Login</button>
             </div>
         </form>

@@ -17,65 +17,32 @@ class ChangePasswordForm(FlaskForm):
 
 class RegistrationForm(FlaskForm):
     user_name = StringField('Username', validators=[
-        DataRequired(), 
-        Length(min=10, max=20), 
-        Regexp('^[A-Za-z]*$', message="Username should only contain alphabets.")
+        InputRequired(), 
     ])
     email = StringField('Email', validators=[
-        DataRequired(), 
-        Email(message="Invalid email address.")
+        InputRequired(), 
+        Email()
     ])
     mobile_number = TelField('Mobile Number', validators=[
-        DataRequired(), 
-        Length(min=10, max=10, message="Mobile number must be 10 digits."),
-        Regexp('^[0-9]{10}$', message="Invalid mobile number.")
+        InputRequired()
     ])
-    date_of_birth = DateField('Date of Birth (MM-DD-YYYY)', format='%m-%d-%Y', validators=[DataRequired()])
+    date_of_birth = DateField('Date of Birth (MM-DD-YYYY)', validators=[InputRequired()])
     password = PasswordField('Password', validators=[
-        DataRequired(),
-        Length(min=8),
-        Regexp(r'[A-Z]', message="Password must contain at least one uppercase letter."),
-        Regexp(r'[0-9]', message="Password must contain at least one digit."),
-        Regexp(r'[!@#$%^&*(),.?":{}|<>]', message="Password must contain at least one special character.")
+        InputRequired(),
+        Length(min=6),
     ])
     confirm_password = PasswordField('Confirm Password', validators=[EqualTo('password', message="Passwords must match.")])
-    
     security_question = SelectField('Security Question', choices=[
         ('', 'Choose a question'), 
         ('favorite_book', 'What is your favorite book?'),
         ('favorite_pet', 'What was the name of your favorite pet?'),
         ('favorite_food', 'What is your favorite food?')
-    ], validators=[DataRequired()])
-    
+    ], validators=[InputRequired()])
     security_answer = StringField('Security Answer', validators=[
-        DataRequired(),
-        Length(max=20, message="Security answer should not exceed 20 characters."),
-        Regexp(r'^[A-Za-z ]*$', message="Security answer can only contain alphabets and spaces.")
+        InputRequired(),
     ])
+    submitRegisteration = SubmitField('SIGNUP')
     
-    submit = SubmitField('SIGNUP')
-    
-    # Custom validators
-    def validate_email(self, email):
-        from .models import get_db_connection
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute('SELECT * FROM User WHERE email_address = %s', (email.data,))
-        user = cursor.fetchone()
-        if user:
-            raise ValidationError("Email already exists.")
-        conn.close()
-
-    def validate_mobile_number(self, mobile_number):
-        from .models import get_db_connection
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute('SELECT * FROM User WHERE mobile_number = %s', (mobile_number.data,))
-        user = cursor.fetchone()
-        if user:
-            raise ValidationError("Mobile number already exists.")
-        conn.close()
-
 
 
 class BookingForm(FlaskForm):
@@ -98,7 +65,7 @@ class BookingForm(FlaskForm):
     price_per_ticket = IntegerField('Price per Ticket', validators=[DataRequired()])
     
     # Booking Date (editable)
-    date_of_booking = DateField('Date of Booking', format='%m-%d-%Y', validators=[DataRequired()])
+    date_of_booking = DateField('Date of Booking', validators=[DataRequired()])
     
     # Time of Booking (editable)
     time_of_booking = SelectField('Select Time', choices=[
@@ -114,7 +81,7 @@ class BookingForm(FlaskForm):
     ])
     
     # Submit button
-    submit = SubmitField('Book Now')
+    submitBook = SubmitField('Book Now')
     
     def validate_date(self):
         # Booking date must be greater than the current date and within a span of 3 days

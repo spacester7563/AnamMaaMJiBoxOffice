@@ -49,13 +49,11 @@ def change_password():
 
         if not user:
             flash("User not found!", "danger")
-        elif not check_password_hash(user['password'], old_password):
-            flash("Old password is incorrect!", "danger")
         elif old_password == new_password:
             flash("New password must be different from the old password!", "danger")
         else:
             # Update password in the database (hashing the new password)
-            hashed_password = generate_password_hash(new_password)
+            hashed_password = new_password
             cursor.execute('UPDATE User SET password = %s WHERE email_address = %s', (hashed_password, email))
             conn.commit()
             flash("Password updated successfully!", "success")
@@ -85,6 +83,7 @@ def register():
         mobile_number = form.mobile_number.data
         date_of_birth = form.date_of_birth.data
         password = form.password.data
+        confirm_password = form.confirm_password.data
         security_question = form.security_question.data
         security_answer = form.security_answer.data
         
@@ -115,7 +114,7 @@ def redirect_index():
 def book_ticket():
     form = BookingForm()
     
-    if request.method == 'POST' and form.validate_on_submit():
+    if request.method == 'POST':
         # Retrieve selected movie and theater info
         selected_movie_theater = request.form['movie_theater']
         movie_name, theater_name = selected_movie_theater.split('|')  # Extract movie and theater from the radio button value
@@ -125,6 +124,10 @@ def book_ticket():
         time_of_booking = form.time_of_booking.data
         no_of_tickets = form.no_of_tickets_required.data
         
+        
+        # Convert date_of_booking to string (in YYYY-MM-DD format)
+        date_of_booking_str = date_of_booking.strftime('%Y-%m-%d')
+
         # Fetch seat capacity and price per ticket from the database
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
@@ -143,7 +146,7 @@ def book_ticket():
         cursor.execute('''SELECT SUM(no_of_tickets_required) AS booked_tickets
                           FROM Booking
                           WHERE movie_name = %s AND theater_name = %s AND date_of_booking = %s AND time_of_booking = %s''', 
-                       (movie_name, theater_name, date_of_booking, time_of_booking))
+                       (movie_name, theater_name, date_of_booking_str, time_of_booking))
         booked_tickets = cursor.fetchone()['booked_tickets'] or 0
         
         available_seats = seat_capacity - booked_tickets
@@ -159,12 +162,12 @@ def book_ticket():
         cursor.execute('''INSERT INTO Booking (email_address, movie_name, theater_name, date_of_booking, time_of_booking, 
                                                no_of_tickets_required, total_amount, status)
                           VALUES (%s, %s, %s, %s, %s, %s, %s, 'Booked')''', 
-                       (user_email, movie_name, theater_name, date_of_booking, time_of_booking, no_of_tickets, total_amount))
+                       (user_email, movie_name, theater_name, date_of_booking_str, time_of_booking, no_of_tickets, total_amount))
         conn.commit()
         conn.close()
 
         flash("Your booking is confirmed!", "success")
-        return redirect(url_for('main.customer_home'))  # Redirect to home page after booking
+        return redirect(url_for('main.book_ticket'))  # Redirect to home page after booking
 
     # Fetch movie and theater details for displaying the table
     conn = get_db_connection()
@@ -215,28 +218,18 @@ def cancel_ticket():
     email_address = session.get('email_address')  # Ensure the email is in session
     if not email_address:
         flash("You need to log in to cancel your booking!", "danger")
-        return redirect(url_for('main.index'))
+        return redirect(url_for('main.cancel_ticket'))
 
     if request.method == 'POST':
         selected_booking_id = request.form.get('selected_booking')  # Get the selected booking ID
 
         if not selected_booking_id:
             flash("Please select at least one of the bookings to cancel", "danger")
-            return render_template('cancel_ticket.html')
+            return render_template('customer_cancel.html')
 
         # Check if the selected booking is valid
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("""
-            SELECT * FROM Booking 
-            WHERE booking_id = %s AND email_address = %s AND status = 'Booked' AND date_of_booking > %s
-        """, (selected_booking_id, email_address, datetime.now().date()))
-
-        booking = cursor.fetchone()
-
-        if not booking:
-            flash("Invalid booking or the booking cannot be canceled!", "danger")
-            return render_template('cancel_ticket.html')
 
         # Proceed to cancel the booking
         cursor.execute("""
@@ -245,20 +238,12 @@ def cancel_ticket():
             WHERE booking_id = %s
         """, (selected_booking_id,))
 
-        # Update seat capacity in the theater
-        cursor.execute("""
-            UPDATE Theater t 
-            JOIN Booking b ON t.theater_name = b.theater_name
-            SET t.seat_capacity = t.seat_capacity + b.no_of_tickets_required
-            WHERE b.booking_id = %s
-        """, (selected_booking_id,))
 
         conn.commit()
         conn.close()
 
         flash("Movie ticket cancellation is done successfully!", "success")
-        return redirect(url_for('main.customer_home'))  # Redirect to home page after cancellation
-
+        return redirect(url_for('main.cancel_ticket'))  # Redirect to home page after cancellation
     
     email_address = session.get('email_address')  # Replace with session-based user email or logged-in user's email
     # Fetch all bookings of the user which are booked and have a future date
@@ -269,9 +254,10 @@ def cancel_ticket():
         SELECT b.booking_id, b.movie_name, b.theater_name, b.date_of_booking, b.time_of_booking, 
                b.no_of_tickets_required, b.total_amount, b.status
         FROM Booking b
-        WHERE b.email_address = %s
+        WHERE b.email_address = %s AND b.status <> 'Cancelled'
         ORDER BY b.date_of_booking DESC
     """, (email_address,))
+
     
     bookings = cursor.fetchall()
 

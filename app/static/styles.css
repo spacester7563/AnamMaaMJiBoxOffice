@@ -133,25 +133,11 @@ button {
     width: 100%;
     height: 40px;
     margin-left: 8px;
+    margin-top: 8px;
     border-width: 0px;
 }
 
-/* Submit Button Styling */
-button[type="submit"] {
-    background-color: darkblue;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
-    font-size: 16px;
-    cursor: pointer;
-    width: 100%;
-}
 
-/* Button Hover Effect */
-button[type="submit"]:hover {
-    background-color: darkblue;
-}
 
 /* Link Styling */
 a {

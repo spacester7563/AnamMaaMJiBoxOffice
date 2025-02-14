@@ -61,6 +61,12 @@ def change_password():
             return redirect(url_for('main.index'))  # Redirect to login page
 
         conn.close()
+    
+    else:
+        # Flash the error messages for invalid form
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(error, 'error')  # Flash the error message with category 'error'
 
     return render_template('change_password.html', form=form)
 
@@ -71,6 +77,10 @@ def customer_home():
     
     # Pass the user_name to the template
     return render_template('customer_home.html', user_name=user_name)
+
+from flask import flash, redirect, url_for, render_template
+import mysql.connector
+from mysql.connector import errors
 
 @main.route('/register', methods=['GET', 'POST'])
 def register():
@@ -86,25 +96,48 @@ def register():
         confirm_password = form.confirm_password.data
         security_question = form.security_question.data
         security_answer = form.security_answer.data
+
+        # Validate form fields
+        if not user_name or not email or not mobile_number or not date_of_birth or not password or not security_question or not security_answer:
+            flash("All fields are required.", "danger")
+            return render_template('register.html', form=form)
         
-        # Hash the password
-        hashed_password = password
-        
-        # Insert into database
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute('''
-            INSERT INTO User (email_address, user_name, mobile_number, date_of_birth, password, security_question, security_answer, role)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, 'user')
-        ''', (email, user_name, mobile_number, date_of_birth, hashed_password, security_question, security_answer))
-        
-        conn.commit()
-        conn.close()
-        
-        flash("Registration successful!", "success")
-        return redirect(url_for('main.index'))  # Redirect to login page
+        # Hash the password (ensure proper hashing, not plain text)
+        hashed_password = password  # Note: Implement proper hashing (e.g., using bcrypt)
+
+        try:
+            # Insert into database
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute('''
+                INSERT INTO User (email_address, user_name, mobile_number, date_of_birth, password, security_question, security_answer, role)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, 'user')
+            ''', (email, user_name, mobile_number, date_of_birth, hashed_password, security_question, security_answer))
+
+            conn.commit()
+            conn.close()
+
+            flash("Registration successful!", "success")
+            return redirect(url_for('main.register'))  # Redirect to login page
+
+        except errors.IntegrityError as e:
+            # Handle specific error for duplicate entry (email or mobile)
+            if "user.PRIMARY" in str(e):  # Check if the error is related to the email field
+                flash("Email already exists", "danger")
+            elif "user.mobile_number" in str(e):  # Check if the error is related to the mobile number field
+                flash("Mobile number already exists", "danger")
+            else:
+                flash("An error occurred during registration. Please try again.", "danger")
+            return render_template('register.html', form=form)
+
+    else:
+        # Flash the error messages for invalid form
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(error, 'error')  # Flash the error message with category 'error'
 
     return render_template('register.html', form=form)
+
 
 @main.route('/index')
 def redirect_index():
@@ -164,6 +197,14 @@ def book_ticket():
                           VALUES (%s, %s, %s, %s, %s, %s, %s, 'Booked')''', 
                        (user_email, movie_name, theater_name, date_of_booking_str, time_of_booking, no_of_tickets, total_amount))
         conn.commit()
+
+        new_seat_capacity = seat_capacity - no_of_tickets
+        cursor.execute('''UPDATE Theater 
+                          SET seat_capacity = %s 
+                          WHERE theater_name = %s''', 
+                       (new_seat_capacity, theater_name))
+        conn.commit()
+
         conn.close()
 
         flash("Your booking is confirmed!", "success")
@@ -222,7 +263,10 @@ def cancel_ticket():
 
     if request.method == 'POST':
         selected_booking_id = request.form.get('selected_booking')  # Get the selected booking ID
-
+        theater_name = request.form.get('theater_name')  # Get the selected theater name from the form
+        no_of_tickets_required  = request.form.get('no_of_tickets_required')
+        no_of_tickets_required = int(no_of_tickets_required)
+        
         if not selected_booking_id:
             flash("Please select at least one of the bookings to cancel", "danger")
             return render_template('customer_cancel.html')
@@ -240,6 +284,29 @@ def cancel_ticket():
 
 
         conn.commit()
+
+        # Update the theater's seat capacity (add back the canceled tickets)
+        cursor.execute("""
+            SELECT seat_capacity
+            FROM Theater
+            WHERE theater_name = %s
+        """, (theater_name,))
+        theater_data = cursor.fetchone()
+
+
+        current_seat_capacity = theater_data['seat_capacity']
+
+        # Add back the canceled tickets to the seat capacity
+        new_seat_capacity = current_seat_capacity + no_of_tickets_required 
+
+        # Update the seat capacity in the Theater table
+        cursor.execute("""
+                UPDATE Theater
+                SET seat_capacity = %s
+                WHERE theater_name = %s
+        """, (new_seat_capacity, theater_name))
+        conn.commit()
+
         conn.close()
 
         flash("Movie ticket cancellation is done successfully!", "success")

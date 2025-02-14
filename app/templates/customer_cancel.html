@@ -64,7 +64,17 @@
                                     <td>{{ booking.no_of_tickets_required }}</td>
                                     <td>${{ booking.total_amount }}</td>
                                     <td>{{ booking.status }}</td>
-                                    <td><input type="radio" name="selected_booking" value="{{ booking.booking_id }}"></td>
+                                    <td>
+                                        <!-- Radio button for selecting the booking -->
+                                        <input type="radio" name="selected_booking" value="{{ booking.booking_id }}" 
+                                            data-theater="{{ booking.theater_name }}" data-tickets="{{ booking.no_of_tickets_required }}">
+
+                                        <!-- Hidden input for theater_name -->
+                                        <input type="hidden" name="theater_name" value="{{ booking.theater_name }}">
+
+                                        <!-- Hidden input for no_of_tickets -->
+                                        <input type="hidden" name="no_of_tickets_required" value="{{ booking.no_of_tickets_required }}">
+                                    </td>
                                 </tr>
                             {% endfor %}
                         {% else %}
